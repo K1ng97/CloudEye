@@ -9,13 +9,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/yourusername/cloud-eye/internal/api/handler"
-	"github.com/yourusername/cloud-eye/internal/api/router"
-	"github.com/yourusername/cloud-eye/internal/pkg/config"
-	"github.com/yourusername/cloud-eye/internal/pkg/database"
-	"github.com/yourusername/cloud-eye/internal/pkg/logger"
-	"github.com/yourusername/cloud-eye/internal/repository"
-	"github.com/yourusername/cloud-eye/internal/service"
+	"github.com/K1ng97/CloudEye/internal/api/handler"
+	"github.com/K1ng97/CloudEye/internal/api/router"
+	"github.com/K1ng97/CloudEye/internal/pkg/config"
+	"github.com/K1ng97/CloudEye/internal/pkg/database"
+	"github.com/K1ng97/CloudEye/internal/pkg/logger"
+	"github.com/K1ng97/CloudEye/internal/repository"
+	"github.com/K1ng97/CloudEye/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
