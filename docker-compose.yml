@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  # MySQL数据库服务
+  mysql:
+    image: mysql:8.0
+    container_name: cloudeye-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: cloud_eye
+      MYSQL_USER: cloudeye
+      MYSQL_PASSWORD: cloudeye_pass
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init_database.sql:/docker-entrypoint-initdb.d/init_database.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cloudeye-network
+
+  # 后端Go应用服务
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: cloudeye-backend
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./configs:/app/configs
+      - backend-logs:/app/logs
+      - backend-uploads:/app/uploads
+    ports:
+      - "8080:8080"
+    networks:
+      - cloudeye-network
+    # 替换配置文件中的数据库连接信息
+    command: >
+      sh -c "sed -i 's/host: localhost/host: mysql/g' /app/configs/config.yaml &&
+             ./cloud-eye-server"
+
+  # 前端Angular应用服务
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cloudeye-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - cloudeye-network
+
+networks:
+  cloudeye-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  backend-logs:
+  backend-uploads:
